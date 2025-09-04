@@ -47,14 +47,15 @@ data.json
 */data.json
 .obsidian/plugins/*/data.json
 
-# Build artifacts (keep main.js for releases)
-# main.js - commented out so it's included in releases
+# Build artifacts
+main.js
 
 # Test artifacts
 *.test.js.map
 
 # Development files
 test-*.js
+install-plugin.sh
 
 # IDE files
 .idea/
