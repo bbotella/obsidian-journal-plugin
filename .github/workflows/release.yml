@@ -8,7 +8,9 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    
+    permissions:
+      contents: write
+      
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -28,76 +30,35 @@ jobs:
     - name: Build plugin
       run: npm run build
       
-    - name: Create release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          ## Changes
-          
-          See [CHANGELOG.md](CHANGELOG.md) for details.
-          
-          ## Installation
-          
-          ### Manual Installation
-          1. Download `main.js`, `manifest.json`, and `styles.css` from the assets below
-          2. Create a folder `obsidian-journal-plugin` in your vault's `.obsidian/plugins/` directory
-          3. Copy the downloaded files into the folder
-          4. Reload Obsidian and enable the plugin in Community Plugins settings
-          
-          ### From Release
-          1. Download the `obsidian-journal-plugin-${{ github.ref_name }}.zip` file below
-          2. Extract it to your vault's `.obsidian/plugins/` directory
-          3. Reload Obsidian and enable the plugin
-        draft: false
-        prerelease: false
-        
     - name: Create release assets
       run: |
         mkdir release
         cp main.js manifest.json styles.css release/
         cd release && zip -r ../obsidian-journal-plugin-${{ github.ref_name }}.zip .
         
-    - name: Upload release zip
-      uses: actions/upload-release-asset@v1
+    - name: Create release
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./obsidian-journal-plugin-${{ github.ref_name }}.zip
-        asset_name: obsidian-journal-plugin-${{ github.ref_name }}.zip
-        asset_content_type: application/zip
-        
-    - name: Upload main.js
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./main.js
-        asset_name: main.js
-        asset_content_type: application/javascript
-        
-    - name: Upload manifest.json
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./manifest.json
-        asset_name: manifest.json
-        asset_content_type: application/json
-        
-    - name: Upload styles.css
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./styles.css
-        asset_name: styles.css
-        asset_content_type: text/css
+      run: |
+        gh release create ${{ github.ref_name }} \
+          --title "Release ${{ github.ref_name }}" \
+          --notes "## Changes
+
+        See [CHANGELOG.md](CHANGELOG.md) for details.
+
+        ## Installation
+
+        ### Manual Installation
+        1. Download \`main.js\`, \`manifest.json\`, and \`styles.css\` from the assets below
+        2. Create a folder \`obsidian-journal-plugin\` in your vault's \`.obsidian/plugins/\` directory
+        3. Copy the downloaded files into the folder
+        4. Reload Obsidian and enable the plugin in Community Plugins settings
+
+        ### From Release
+        1. Download the \`obsidian-journal-plugin-${{ github.ref_name }}.zip\` file below
+        2. Extract it to your vault's \`.obsidian/plugins/\` directory
+        3. Reload Obsidian and enable the plugin" \
+          main.js \
+          manifest.json \
+          styles.css \
+          obsidian-journal-plugin-${{ github.ref_name }}.zip
