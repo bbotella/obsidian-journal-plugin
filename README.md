@@ -300,3 +300,13 @@ MIT License - see LICENSE file for details.
 ## Changelog
 
 See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
+
+---
+
+## Support the Project
+
+If you find this plugin helpful, consider supporting its development:
+
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/contactonu)
+
+Your support helps maintain and improve this plugin. Thank you! 🙏
