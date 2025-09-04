@@ -190,9 +190,10 @@ The plugin recognizes various coordinate formats:
 
 ### Security Features
 - Input validation and sanitization
-- Secure API key storage
+- Secure API key storage in Obsidian's vault settings
 - No sensitive data in logs or debug output
 - Optional local processing with Ollama
+- Plugin settings (including API keys) excluded from git tracking
 
 ## Troubleshooting
 

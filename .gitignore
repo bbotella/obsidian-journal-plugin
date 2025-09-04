@@ -39,8 +39,13 @@ coverage/
 # vscode
 .vscode/
 
-# Obsidian
+# Obsidian vault configuration and plugin settings
 .obsidian/
+
+# Plugin settings containing API keys and sensitive data
+data.json
+*/data.json
+.obsidian/plugins/*/data.json
 
 # Build artifacts (keep main.js for releases)
 # main.js - commented out so it's included in releases
