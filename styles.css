@@ -1,0 +1,198 @@
+/* Folder suggestion button styling */
+.setting-folder-suggest-button {
+  transition: all 0.2s ease;
+}
+
+.setting-folder-suggest-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Model refresh button styling */
+.setting-model-refresh-button {
+  transition: all 0.2s ease;
+  background: var(--interactive-normal);
+  border: 1px solid var(--background-modifier-border);
+  color: var(--text-normal);
+  cursor: pointer;
+}
+
+.setting-model-refresh-button:hover {
+  background: var(--interactive-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.setting-model-refresh-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Model dropdown with refresh button layout */
+.setting-item-control:has(.setting-model-refresh-button) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setting-item-control:has(.setting-model-refresh-button) .dropdown {
+  flex: 1;
+}
+
+/* Folder validation styling */
+.folder-valid {
+  box-shadow: 0 0 0 1px var(--color-green) !important;
+}
+
+.folder-invalid {
+  box-shadow: 0 0 0 1px var(--color-orange) !important;
+}
+
+.folder-validation-msg {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Folder suggestion modal enhancements */
+.suggestion-title {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.suggestion-note {
+  opacity: 0.7;
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+
+.suggestion-aux {
+  opacity: 0.6;
+  font-size: 10px;
+  font-style: italic;
+}
+
+/* Setting item control button container */
+.setting-item-control-button-container {
+  flex-shrink: 0;
+}
+
+/* Better spacing for settings with buttons */
+.setting-item-control:has(.setting-item-control-button-container) {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.setting-item-control:has(.setting-item-control-button-container) > input {
+  flex: 1;
+}
+
+/* Journal plugin specific styles */
+.journal-plugin-settings {
+  padding: 20px;
+}
+
+.journal-plugin-settings h3 {
+  margin-top: 30px;
+  margin-bottom: 15px;
+  color: var(--text-accent);
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 5px;
+}
+
+/* Status messages */
+.mod-success {
+  color: var(--color-green);
+  background-color: var(--color-green-rgb);
+  background-color: rgba(var(--color-green-rgb), 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid var(--color-green);
+  margin-top: 10px;
+}
+
+.mod-error {
+  color: var(--color-red);
+  background-color: var(--color-red-rgb);
+  background-color: rgba(var(--color-red-rgb), 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid var(--color-red);
+  margin-top: 10px;
+}
+
+.mod-warning {
+  color: var(--color-orange);
+  background-color: var(--color-orange-rgb);
+  background-color: rgba(var(--color-orange-rgb), 0.1);
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid var(--color-orange);
+  margin-top: 10px;
+}
+
+/* Custom prompt textarea */
+.journal-custom-prompt {
+  font-family: var(--font-monospace);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* Action buttons styling */
+.journal-action-button {
+  transition: all 0.2s ease;
+}
+
+.journal-action-button:hover {
+  transform: translateY(-1px);
+}
+
+/* AI Provider specific styling */
+.ai-provider-description {
+  font-size: 13px;
+  opacity: 0.8;
+  margin-bottom: 15px;
+}
+
+/* Model selection enhancement */
+.model-selection-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.model-selection-status {
+  font-size: 11px;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .setting-item-control-button-container {
+    margin-left: 4px;
+  }
+  
+  .setting-folder-suggest-button {
+    min-width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+  
+  .setting-model-refresh-button {
+    min-width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+}
