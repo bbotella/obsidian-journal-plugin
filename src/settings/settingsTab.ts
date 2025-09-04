@@ -226,6 +226,7 @@ export class JournalPluginSettingTab extends PluginSettingTab {
     this.addSchedulingSettings();
     this.addAdvancedSettings();
     this.addActionButtons();
+    this.addSupportSection();
   }
 
   private addBasicSettings(): void {
@@ -737,5 +738,34 @@ export class JournalPluginSettingTab extends PluginSettingTab {
           
           setTimeout(() => statusEl.remove(), 10000);
         }));
+  }
+
+  private addSupportSection(): void {
+    const { containerEl } = this;
+
+    containerEl.createEl('h3', { text: 'Support' });
+
+    // Support information with funding link
+    const supportDesc = containerEl.createEl('div', { 
+      cls: 'setting-item-description' 
+    });
+    
+    supportDesc.innerHTML = `
+      <p>If you find this plugin helpful, consider supporting its development:</p>
+      <p style="margin-top: 10px;">
+        <a href="https://buymeacoffee.com/contactonu" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #FFDD00; color: #000; text-decoration: none; border-radius: 5px; font-weight: 500;">
+          <span>☕</span> Buy me a coffee
+        </a>
+      </p>
+      <p style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">
+        Your support helps maintain and improve this plugin. Thank you! 🙏
+      </p>
+    `;
+
+    // Add some spacing
+    supportDesc.style.marginBottom = '20px';
   }
 }
