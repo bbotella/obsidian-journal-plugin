@@ -1,7 +1,7 @@
 {
 	"id": "obsidian-journal-plugin",
 	"name": "Daily Notes to Journal",
-	"version": "0.1.3",
+	"version": "0.1.4",
 	"minAppVersion": "0.15.0",
 	"description": "Transform daily note logs into well-written journal entries using AI",
 	"author": "Bernardo Botella",
