@@ -209,6 +209,10 @@ class FolderSuggest {
 
 export class JournalPluginSettingTab extends PluginSettingTab {
   plugin: JournalPlugin;
+  private aiConfigContainer: HTMLElement;
+  private modelCache: Map<AIProvider, string[]> = new Map();
+  private lastCacheTime: Map<AIProvider, number> = new Map();
+  private readonly CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
   constructor(app: App, plugin: JournalPlugin) {
     super(app, plugin);
@@ -344,6 +348,10 @@ export class JournalPluginSettingTab extends PluginSettingTab {
           .onChange(async (value: AIProvider) => {
             this.plugin.settings.aiProvider = value;
             
+            // Clear cache when provider changes
+            this.modelCache.clear();
+            this.lastCacheTime.clear();
+            
             // Reset config when provider changes
             const fallbackModels = AIServiceFactory.getFallbackModels(value);
             this.plugin.settings.aiConfig.model = fallbackModels[0] || '';
@@ -368,14 +376,29 @@ export class JournalPluginSettingTab extends PluginSettingTab {
 
     modelSetting.addDropdown(dropdown => {
       modelDropdown = dropdown;
-      const fallbackModels = AIServiceFactory.getFallbackModels(this.plugin.settings.aiProvider);
-      this.updateModelDropdown(dropdown, this.plugin.settings.aiProvider, fallbackModels);
-      dropdown
-        .setValue(this.plugin.settings.aiConfig.model)
-        .onChange(async (value) => {
-          this.plugin.settings.aiConfig.model = value;
-          await this.plugin.saveSettings();
-        });
+      
+      // First check if we have cached models for this provider
+      const cachedModels = this.modelCache.get(this.plugin.settings.aiProvider);
+      let modelsToUse = cachedModels;
+      
+      if (!modelsToUse) {
+        // If no cached models, use fallback models temporarily
+        modelsToUse = AIServiceFactory.getFallbackModels(this.plugin.settings.aiProvider);
+      }
+      
+      // Only update dropdown options, don't auto-select anything yet
+      this.updateModelDropdown(dropdown, this.plugin.settings.aiProvider, modelsToUse, false);
+      
+      // Set the current model if it exists in the available models
+      const currentModel = this.plugin.settings.aiConfig.model;
+      if (currentModel && modelsToUse.includes(currentModel)) {
+        dropdown.setValue(currentModel);
+      }
+      
+      dropdown.onChange(async (value) => {
+        this.plugin.settings.aiConfig.model = value;
+        await this.plugin.saveSettings();
+      });
     });
 
     // Add refresh button for models
@@ -399,15 +422,22 @@ export class JournalPluginSettingTab extends PluginSettingTab {
     this.aiConfigContainer = containerEl.createDiv();
     this.refreshAIConfigSettings();
 
-    // Initial model fetch for current provider
+    // Initial model fetch for current provider - only if no API key/endpoint configured yet
     setTimeout(() => {
-      this.fetchAndUpdateModels(this.plugin.settings.aiProvider, modelDropdown, modelRefreshButton);
+      const requirements = AIServiceFactory.getProviderRequirements(this.plugin.settings.aiProvider);
+      const hasRequiredConfig = (!requirements.requiresApiKey || this.plugin.settings.aiConfig.apiKey) &&
+                               (!requirements.requiresEndpoint || this.plugin.settings.aiConfig.endpoint);
+      
+      if (hasRequiredConfig) {
+        this.fetchAndUpdateModels(this.plugin.settings.aiProvider, modelDropdown, modelRefreshButton);
+      }
     }, 100);
   }
 
-  private aiConfigContainer: HTMLElement;
-
-  private updateModelDropdown(dropdown: DropdownComponent, provider: AIProvider, models?: string[]): void {
+  private updateModelDropdown(dropdown: DropdownComponent, provider: AIProvider, models?: string[], preserveSelection: boolean = true): void {
+    // Remember the current selection
+    const currentSelection = this.plugin.settings.aiConfig.model;
+    
     // Clear existing options
     dropdown.selectEl.empty();
     
@@ -421,16 +451,51 @@ export class JournalPluginSettingTab extends PluginSettingTab {
     modelList.forEach(model => {
       dropdown.addOption(model, model);
     });
+    
+    if (preserveSelection) {
+      // Restore the selection if it's still available in the new model list
+      if (currentSelection && modelList.includes(currentSelection)) {
+        dropdown.setValue(currentSelection);
+      } else if (modelList.length > 0) {
+        // If the current selection is not available, use the first model and update settings
+        dropdown.setValue(modelList[0]);
+        this.plugin.settings.aiConfig.model = modelList[0];
+        this.plugin.saveSettings();
+      }
+    }
+    // If preserveSelection is false, don't set any value - let the caller handle it
   }
 
   /**
-   * Fetch and update models for a specific provider
+   * Fetch and update models for a specific provider with caching
    */
   private async fetchAndUpdateModels(
     provider: AIProvider, 
     dropdown: DropdownComponent, 
     refreshButton: HTMLButtonElement
   ): Promise<void> {
+    // Check cache first
+    const now = Date.now();
+    const lastCache = this.lastCacheTime.get(provider);
+    const cachedModels = this.modelCache.get(provider);
+    
+    if (cachedModels && lastCache && (now - lastCache) < this.CACHE_DURATION) {
+      // Use cached models and preserve selection
+      const currentSelection = this.plugin.settings.aiConfig.model;
+      
+      this.updateModelDropdown(dropdown, provider, cachedModels, false);
+      
+      // Restore selection if it was in the cached list
+      if (currentSelection && cachedModels.includes(currentSelection)) {
+        dropdown.setValue(currentSelection);
+      } else if (cachedModels.length > 0) {
+        // If current selection is not in cached models, it may have been removed
+        // Only change if we're confident the current selection is invalid
+        // Don't auto-change - let user decide
+      }
+      return;
+    }
+
     // Don't fetch models if no API key/endpoint is configured
     const requirements = AIServiceFactory.getProviderRequirements(provider);
     if (requirements.requiresApiKey && !this.plugin.settings.aiConfig.apiKey) {
@@ -444,11 +509,21 @@ export class JournalPluginSettingTab extends PluginSettingTab {
       const result = await AIServiceFactory.fetchAvailableModels(provider, this.plugin.settings.aiConfig);
       
       if (result.success && result.models.length > 0) {
-        this.updateModelDropdown(dropdown, provider, result.models);
+        // Cache the models
+        this.modelCache.set(provider, result.models);
+        this.lastCacheTime.set(provider, now);
         
-        // Update current selection if it's not in the new list
-        const currentModel = this.plugin.settings.aiConfig.model;
-        if (!result.models.includes(currentModel) && result.models.length > 0) {
+        // Preserve the current selection
+        const currentSelection = this.plugin.settings.aiConfig.model;
+        
+        // Update dropdown without auto-selecting, let us handle selection manually
+        this.updateModelDropdown(dropdown, provider, result.models, false);
+        
+        // Now handle selection preservation manually
+        if (currentSelection && result.models.includes(currentSelection)) {
+          dropdown.setValue(currentSelection);
+        } else if (result.models.length > 0) {
+          // Only change if the current selection is invalid
           this.plugin.settings.aiConfig.model = result.models[0];
           dropdown.setValue(result.models[0]);
           await this.plugin.saveSettings();
@@ -475,6 +550,10 @@ export class JournalPluginSettingTab extends PluginSettingTab {
     refreshButton.disabled = true;
     
     try {
+      // Clear cache to force fresh fetch
+      this.modelCache.delete(this.plugin.settings.aiProvider);
+      this.lastCacheTime.delete(this.plugin.settings.aiProvider);
+      
       await this.fetchAndUpdateModels(this.plugin.settings.aiProvider, dropdown, refreshButton);
     } finally {
       refreshButton.textContent = '🔄';
@@ -524,6 +603,10 @@ export class JournalPluginSettingTab extends PluginSettingTab {
             this.plugin.settings.aiConfig.apiKey = value.trim();
             await this.plugin.saveSettings();
             
+            // Clear cache when API key changes
+            this.modelCache.delete(this.plugin.settings.aiProvider);
+            this.lastCacheTime.delete(this.plugin.settings.aiProvider);
+            
             // Trigger model refresh when API key is updated
             this.triggerModelRefresh();
           }));
@@ -540,6 +623,10 @@ export class JournalPluginSettingTab extends PluginSettingTab {
           .onChange(async (value) => {
             this.plugin.settings.aiConfig.endpoint = value.trim() || 'http://localhost:11434';
             await this.plugin.saveSettings();
+            
+            // Clear cache when endpoint changes
+            this.modelCache.delete(this.plugin.settings.aiProvider);
+            this.lastCacheTime.delete(this.plugin.settings.aiProvider);
             
             // Trigger model refresh when endpoint is updated
             this.triggerModelRefresh();
@@ -573,27 +660,54 @@ export class JournalPluginSettingTab extends PluginSettingTab {
 
     containerEl.createEl('h3', { text: 'Scheduling' });
 
+    let sliderComponent: any;
+    let textComponent: any;
+
     // Check frequency
     new Setting(containerEl)
       .setName('Check frequency')
       .setDesc('How often to check for new daily notes (in minutes)')
-      .addSlider(slider => slider
-        .setLimits(5, 1440, 5) // 5 minutes to 24 hours
-        .setValue(this.plugin.settings.checkFrequency)
-        .setDynamicTooltip()
-        .onChange(async (value) => {
-          this.plugin.settings.checkFrequency = value;
-          await this.plugin.saveSettings();
-        }))
-      .addText(text => text
-        .setValue(this.plugin.settings.checkFrequency.toString())
-        .onChange(async (value) => {
-          const numValue = parseInt(value);
-          if (!isNaN(numValue) && numValue >= 5 && numValue <= 1440) {
-            this.plugin.settings.checkFrequency = numValue;
-            await this.plugin.saveSettings();
-          }
-        }));
+      .addSlider(slider => {
+        sliderComponent = slider;
+        slider
+          .setLimits(5, 1440, 5) // 5 minutes to 24 hours
+          .setValue(this.plugin.settings.checkFrequency)
+          .setDynamicTooltip()
+          .onChange(async (value) => {
+            this.plugin.settings.checkFrequency = value;
+            try {
+              await this.plugin.saveSettings();
+            } catch (error) {
+              console.error('Slider save failed:', error);
+            }
+            // Update the text input to stay in sync
+            if (textComponent) {
+              textComponent.setValue(value.toString());
+            }
+          });
+        return slider;
+      })
+      .addText(text => {
+        textComponent = text;
+        text
+          .setValue(this.plugin.settings.checkFrequency.toString())
+          .onChange(async (value) => {
+            const numValue = parseInt(value);
+            if (!isNaN(numValue) && numValue >= 5 && numValue <= 1440) {
+              this.plugin.settings.checkFrequency = numValue;
+              try {
+                await this.plugin.saveSettings();
+              } catch (error) {
+                console.error('Text save failed:', error);
+              }
+              // Update the slider to stay in sync
+              if (sliderComponent) {
+                sliderComponent.setValue(numValue);
+              }
+            }
+          });
+        return text;
+      });
   }
 
   private addAdvancedSettings(): void {
