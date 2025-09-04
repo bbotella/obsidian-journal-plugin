@@ -2,6 +2,33 @@
 
 Transform your raw daily note logs into well-written, engaging journal entries using AI. This plugin automatically processes daily notes from the past and creates beautiful journal entries with location data, all while maintaining your personal voice and style.
 
+## Personal Workflow: Voice-to-Journal Pipeline
+
+This plugin was designed around a simple but powerful workflow that transforms casual voice memos into meaningful journal entries:
+
+### 📱 **Capture Throughout the Day**
+- Use voice dictation to quickly log moments, thoughts, and experiences
+- No need to worry about perfect writing - just capture the essence
+- Log entries accumulate naturally in your daily notes as raw, authentic thoughts
+
+### 🎤 **iOS Shortcut Integration**
+For seamless voice capture on iOS, you can use this [iOS Shortcut](https://www.icloud.com/shortcuts/f54bdadc71034e08aca3207349a0b624) that:
+- Triggers with a simple action button press
+- Uses Whispr Flow for enhanced dictation (easily replaceable with built-in iOS dictation)
+- Automatically appends entries to your daily note in Obsidian
+- Works with any speech-to-text service or manual typing
+
+### 🌙 **End-of-Day Transformation**
+When the day ends, the plugin automatically:
+- Finds your raw log entries from throughout the day
+- Uses AI to transform them into a cohesive, well-written journal entry
+- Preserves the emotional context and chronological flow
+- Adds sentiment analysis and location data
+- Creates a beautiful journal entry you'll want to read years from now
+
+### 💫 **The Result**
+Raw voice memos like *"Had coffee, feeling good about the presentation"* become elegant prose that captures not just what happened, but how it felt and why it mattered.
+
 ## Features
 
 ### 🤖 AI-Powered Transformation
