@@ -36,7 +36,7 @@ export class OllamaService extends AIService {
             temperature: 0.7,
             top_p: 0.9,
             top_k: 40,
-            num_predict: 2000
+            num_predict: 4000
           }
         })
       }, 3, 60000); // Longer timeout for local models
