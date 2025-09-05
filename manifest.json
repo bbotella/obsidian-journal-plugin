@@ -1,7 +1,7 @@
 {
   "id": "daily-notes-journal",
   "name": "Daily Notes to Journal",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "minAppVersion": "0.15.0",
   "description": "Transform daily note logs into well-written journal entries using AI",
   "author": "Bernardo Botella",
