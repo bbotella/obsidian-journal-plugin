@@ -1,6 +1,6 @@
 {
   "name": "obsidian-journal-plugin",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Transform daily note logs into well-written journal entries using AI",
   "main": "main.js",
   "scripts": {
