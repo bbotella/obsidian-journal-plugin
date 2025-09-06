@@ -61,7 +61,7 @@ export class AIServiceFactory {
       
       // Check if the service supports dynamic model fetching
       if ('getAvailableModels' in service && typeof service.getAvailableModels === 'function') {
-        const models = await (service as any).getAvailableModels();
+        const models = await service.getAvailableModels();
         return {
           success: true,
           models: models || []

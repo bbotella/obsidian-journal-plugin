@@ -196,3 +196,114 @@
     font-size: 12px;
   }
 }
+
+/* Button container styling */
+.button-container {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+}
+
+/* Action button base styling */
+.action-button {
+  padding: 6px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 6px;
+  background: var(--interactive-normal);
+  color: var(--text-normal);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+}
+
+.action-button:hover {
+  background: var(--interactive-hover);
+  border-color: var(--interactive-accent);
+}
+
+.action-button:focus {
+  background: var(--interactive-normal);
+  border-color: var(--background-modifier-border);
+}
+
+/* Validation message styling */
+.validation-message {
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.validation-message.success {
+  color: var(--color-green);
+}
+
+.validation-message.warning {
+  color: var(--color-orange);
+}
+
+/* Model refresh button enhanced styling */
+.model-refresh-button {
+  margin-left: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+/* Buy me a coffee link styling */
+.support-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #FFDD00;
+  color: #000;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+.support-section {
+  margin-bottom: 20px;
+}
+
+.support-section p:first-child {
+  margin-bottom: 10px;
+}
+
+.support-section p:last-child {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* Custom notice styling */
+.custom-notice {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  max-width: 400px;
+  padding: 16px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+/* Textarea full width styling */
+.textarea-full-width {
+  width: 100%;
+  min-height: 150px;
+}
+
+/* Status element styling */
+.status-element {
+  white-space: pre-wrap;
+  font-size: 12px;
+}

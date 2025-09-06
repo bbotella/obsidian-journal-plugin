@@ -95,29 +95,13 @@ class FolderSuggest {
       const buttonContainer = containerEl.createEl('div', {
         cls: 'setting-item-control-button-container'
       });
-      buttonContainer.style.display = 'inline-flex';
-      buttonContainer.style.alignItems = 'center';
-      buttonContainer.style.marginLeft = '8px';
+      buttonContainer.addClass('button-container');
 
       const button = buttonContainer.createEl('button', {
         text: '📁',
         title: 'Browse folders (Click to select from existing folders)',
-        cls: 'clickable-icon setting-folder-suggest-button'
+        cls: 'clickable-icon setting-folder-suggest-button action-button'
       });
-      
-      // Better button styling
-      button.style.padding = '6px 10px';
-      button.style.border = '1px solid var(--background-modifier-border)';
-      button.style.borderRadius = '6px';
-      button.style.background = 'var(--interactive-normal)';
-      button.style.color = 'var(--text-normal)';
-      button.style.cursor = 'pointer';
-      button.style.fontSize = '14px';
-      button.style.display = 'flex';
-      button.style.alignItems = 'center';
-      button.style.justifyContent = 'center';
-      button.style.minWidth = '32px';
-      button.style.height = '32px';
 
       button.addEventListener('click', (e) => {
         e.preventDefault();
@@ -130,15 +114,7 @@ class FolderSuggest {
       });
 
       // Add hover effects
-      button.addEventListener('mouseenter', () => {
-        button.style.background = 'var(--interactive-hover)';
-        button.style.borderColor = 'var(--interactive-accent)';
-      });
-      
-      button.addEventListener('mouseleave', () => {
-        button.style.background = 'var(--interactive-normal)';
-        button.style.borderColor = 'var(--background-modifier-border)';
-      });
+      // Hover effects are now handled by CSS classes
 
       // Add validation on input change
       this.textComponent.inputEl.addEventListener('input', () => {
@@ -643,14 +619,18 @@ export class JournalPluginSettingTab extends PluginSettingTab {
     const refreshButtons = this.containerEl.querySelectorAll('button[title*="Refresh"]');
     
     if (modelDropdowns.length >= 2 && refreshButtons.length > 0) {
-      const modelDropdown = (modelDropdowns[1] as any)?.__component;
+      const dropdownEl = modelDropdowns[1] as HTMLElement;
       const refreshButton = refreshButtons[0] as HTMLButtonElement;
       
-      if (modelDropdown && refreshButton) {
-        // Delay to allow settings to be saved
-        setTimeout(() => {
-          this.fetchAndUpdateModels(this.plugin.settings.aiProvider, modelDropdown, refreshButton);
-        }, 500);
+      // Try to get the component safely without accessing internal properties
+      if (dropdownEl && refreshButton && 'component' in dropdownEl) {
+        const modelDropdown = (dropdownEl as any).component;
+        if (modelDropdown) {
+          // Delay to allow settings to be saved
+          setTimeout(() => {
+            this.fetchAndUpdateModels(this.plugin.settings.aiProvider, modelDropdown, refreshButton);
+          }, 500);
+        }
       }
     }
   }
@@ -801,7 +781,8 @@ export class JournalPluginSettingTab extends PluginSettingTab {
             });
             
             if (result.errors.length > 0) {
-              statusEl.innerHTML += `<br>⚠️ ${result.errors.length} errors occurred`;
+              const br = statusEl.createEl('br');
+              statusEl.appendText(`⚠️ ${result.errors.length} errors occurred`);
               statusEl.className = 'mod-warning';
             }
             
@@ -864,20 +845,27 @@ export class JournalPluginSettingTab extends PluginSettingTab {
       cls: 'setting-item-description' 
     });
     
-    supportDesc.innerHTML = `
-      <p>If you find this plugin helpful, consider supporting its development:</p>
-      <p style="margin-top: 10px;">
-        <a href="https://buymeacoffee.com/contactonu" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #FFDD00; color: #000; text-decoration: none; border-radius: 5px; font-weight: 500;">
-          <span>☕</span> Buy me a coffee
-        </a>
-      </p>
-      <p style="margin-top: 8px; font-size: 12px; color: var(--text-muted);">
-        Your support helps maintain and improve this plugin. Thank you! 🙏
-      </p>
-    `;
+    const supportP1 = supportDesc.createEl('p');
+    supportP1.appendText('If you find this plugin helpful, consider supporting its development:');
+    
+    const supportP2 = supportDesc.createEl('p', {
+      attr: { style: 'margin-top: 10px;' }
+    });
+    
+    const supportLink = supportP2.createEl('a', {
+      attr: {
+        href: 'https://buymeacoffee.com/contactonu',
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        style: 'display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #FFDD00; color: #000; text-decoration: none; border-radius: 5px; font-weight: 500;'
+      }
+    });
+    supportLink.appendText('☕ Buy me a coffee');
+    
+    const supportP3 = supportDesc.createEl('p', {
+      text: 'Your support helps maintain and improve this plugin. Thank you! 🙏',
+      attr: { style: 'margin-top: 8px; font-size: 12px; color: var(--text-muted);' }
+    });
 
     // Add some spacing
     supportDesc.style.marginBottom = '20px';

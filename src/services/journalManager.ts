@@ -64,8 +64,12 @@ export class JournalManager {
       // Create or update the journal file
       if (FileUtils.fileExists(this.app, journalPath)) {
         logger.info(`Updating existing journal entry: ${journalPath}`);
-        const existingFile = this.app.vault.getAbstractFileByPath(journalPath) as TFile;
-        await FileUtils.updateFile(this.app, existingFile, formattedContent);
+        const existingFile = this.app.vault.getAbstractFileByPath(journalPath);
+        if (existingFile instanceof TFile) {
+          await FileUtils.updateFile(this.app, existingFile, formattedContent);
+        } else {
+          throw new Error(`Expected file at ${journalPath} but got ${existingFile?.constructor.name}`);
+        }
       } else {
         logger.info(`Creating new journal entry: ${journalPath}`);
         await FileUtils.createFile(this.app, journalPath, formattedContent);
@@ -148,7 +152,11 @@ export class JournalManager {
       return { exists: false };
     }
 
-    const file = this.app.vault.getAbstractFileByPath(journalPath) as TFile;
+    const file = this.app.vault.getAbstractFileByPath(journalPath);
+    if (!(file instanceof TFile)) {
+      throw new Error(`Expected file at ${journalPath} but got ${file?.constructor.name}`);
+    }
+    
     const content = await FileUtils.readFile(this.app, file);
 
     return {

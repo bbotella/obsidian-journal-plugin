@@ -276,25 +276,7 @@ export default class JournalPlugin extends Plugin {
   private showNotice(message: string, timeout: number = 5000): void {
     // Create a custom notice element for multi-line messages
     const noticeEl = document.createElement('div');
-    noticeEl.className = 'notice';
-    noticeEl.style.cssText = `
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--background-primary);
-      border: 1px solid var(--background-modifier-border);
-      color: var(--text-normal);
-      padding: 12px 16px;
-      border-radius: 6px;
-      box-shadow: var(--shadow-s);
-      z-index: 1000;
-      max-width: 400px;
-      white-space: pre-line;
-      font-family: var(--font-interface);
-      font-size: var(--font-ui-small);
-      line-height: 1.4;
-    `;
-    
+    noticeEl.className = 'notice custom-notice';
     noticeEl.textContent = message;
     
     document.body.appendChild(noticeEl);
