@@ -42,11 +42,11 @@
 
 /* Folder validation styling */
 .folder-valid {
-  box-shadow: 0 0 0 1px var(--color-green) !important;
+  border-color: var(--color-green) !important;
 }
 
 .folder-invalid {
-  box-shadow: 0 0 0 1px var(--color-orange) !important;
+  border-color: var(--color-orange) !important;
 }
 
 .folder-validation-msg {
@@ -298,12 +298,77 @@
 
 /* Textarea full width styling */
 .textarea-full-width {
-  width: 100%;
-  min-height: 150px;
+  width: 100% !important;
+  min-height: 150px !important;
 }
 
 /* Status element styling */
 .status-element {
   white-space: pre-wrap;
+  font-size: 12px;
+}
+
+/* Model refresh button specific styling */
+.model-refresh-button {
+  margin-left: 8px !important;
+  padding: 6px 10px !important;
+  border-radius: 6px !important;
+  font-size: 14px !important;
+}
+
+/* Button status colors */
+.button-status-success {
+  color: var(--color-green) !important;
+}
+
+.button-status-error {
+  color: var(--color-red) !important;
+}
+
+/* Status display styling */
+.status-display {
+  white-space: pre-wrap !important;
+  font-size: 12px !important;
+}
+
+/* Support section styling */
+.support-section {
+  margin-bottom: 20px;
+}
+
+.support-section-spacing {
+  margin-top: 10px;
+}
+
+.support-section-footer {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.support-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: #FFDD00;
+  color: #000;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+/* Enhanced folder validation messages */
+.folder-validation-msg.success {
+  color: var(--color-green);
+  display: block;
+  margin-top: 4px;
+  font-size: 12px;
+}
+
+.folder-validation-msg.warning {
+  color: var(--color-orange);
+  display: block;
+  margin-top: 4px;
   font-size: 12px;
 }

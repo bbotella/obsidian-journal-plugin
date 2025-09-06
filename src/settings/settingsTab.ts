@@ -148,37 +148,25 @@ class FolderSuggest {
     if (folder instanceof TFolder) {
       // Folder exists
       inputEl.classList.add('folder-valid');
-      inputEl.style.borderColor = 'var(--color-green)';
+      // inputEl border color is now handled by CSS classes (folder-valid/folder-invalid)
       
       // Show file count
       const fileCount = folder.children.filter(child => child.name.endsWith('.md')).length;
       if (fileCount > 0) {
         const msg = inputEl.parentElement?.createEl('small', {
           text: `✅ Found ${fileCount} markdown files`,
-          cls: 'folder-validation-msg'
+          cls: 'folder-validation-msg success'
         });
-        if (msg) {
-          msg.style.color = 'var(--color-green)';
-          msg.style.display = 'block';
-          msg.style.marginTop = '4px';
-          msg.style.fontSize = '12px';
-        }
       }
     } else {
       // Folder doesn't exist
       inputEl.classList.add('folder-invalid');
-      inputEl.style.borderColor = 'var(--color-orange)';
+      // inputEl border color is now handled by CSS classes (folder-valid/folder-invalid)
       
       const msg = inputEl.parentElement?.createEl('small', {
         text: `⚠️ Folder doesn't exist yet (will be created)`,
-        cls: 'folder-validation-msg'
+        cls: 'folder-validation-msg warning'
       });
-      if (msg) {
-        msg.style.color = 'var(--color-orange)';
-        msg.style.display = 'block';
-        msg.style.marginTop = '4px';
-        msg.style.fontSize = '12px';
-      }
     }
   }
 }
@@ -387,11 +375,8 @@ export class JournalPluginSettingTab extends PluginSettingTab {
           await this.refreshModels(modelDropdown, modelRefreshButton);
         });
       
-      // Style the refresh button
-      button.buttonEl.style.marginLeft = '8px';
-      button.buttonEl.style.padding = '6px 10px';
-      button.buttonEl.style.borderRadius = '6px';
-      button.buttonEl.style.fontSize = '14px';
+      // Button styling is now handled by CSS classes
+      button.buttonEl.addClass('model-refresh-button');
     });
 
     // Dynamic AI config settings
@@ -542,15 +527,15 @@ export class JournalPluginSettingTab extends PluginSettingTab {
    */
   private showModelRefreshStatus(button: HTMLButtonElement, success: boolean, message: string): void {
     const originalText = button.textContent;
-    const originalColor = button.style.color;
+    const originalClasses = Array.from(button.classList);
     
     button.textContent = success ? '✅' : '❌';
-    button.style.color = success ? 'var(--color-green)' : 'var(--color-red)';
+    button.classList.add(success ? 'button-status-success' : 'button-status-error');
     button.title = message;
     
     setTimeout(() => {
       button.textContent = originalText;
-      button.style.color = originalColor;
+      button.className = originalClasses.join(' ');
       button.title = 'Refresh available models from endpoint';
     }, 2000);
   }
@@ -708,10 +693,9 @@ export class JournalPluginSettingTab extends PluginSettingTab {
             await this.plugin.saveSettings();
           });
         
-        // Set text area size
+        // Set text area size and styling
         text.inputEl.rows = 8;
-        text.inputEl.style.width = '100%';
-        text.inputEl.style.minHeight = '150px';
+        text.inputEl.addClass('textarea-full-width');
       });
 
     // Information about dynamic processing
@@ -826,10 +810,8 @@ export class JournalPluginSettingTab extends PluginSettingTab {
           
           const statusEl = containerEl.createEl('pre', {
             text: message,
-            cls: className
+            cls: `${className} status-display`
           });
-          statusEl.style.whiteSpace = 'pre-wrap';
-          statusEl.style.fontSize = '12px';
           
           setTimeout(() => statusEl.remove(), 10000);
         }));
@@ -842,32 +824,29 @@ export class JournalPluginSettingTab extends PluginSettingTab {
 
     // Support information with funding link
     const supportDesc = containerEl.createEl('div', { 
-      cls: 'setting-item-description' 
+      cls: 'setting-item-description support-section' 
     });
     
     const supportP1 = supportDesc.createEl('p');
     supportP1.appendText('If you find this plugin helpful, consider supporting its development:');
     
     const supportP2 = supportDesc.createEl('p', {
-      attr: { style: 'margin-top: 10px;' }
+      cls: 'support-section-spacing'
     });
     
     const supportLink = supportP2.createEl('a', {
+      cls: 'support-link',
       attr: {
         href: 'https://buymeacoffee.com/contactonu',
         target: '_blank',
-        rel: 'noopener noreferrer',
-        style: 'display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #FFDD00; color: #000; text-decoration: none; border-radius: 5px; font-weight: 500;'
+        rel: 'noopener noreferrer'
       }
     });
     supportLink.appendText('☕ Buy me a coffee');
     
     const supportP3 = supportDesc.createEl('p', {
       text: 'Your support helps maintain and improve this plugin. Thank you! 🙏',
-      attr: { style: 'margin-top: 8px; font-size: 12px; color: var(--text-muted);' }
+      cls: 'support-section-footer'
     });
-
-    // Add some spacing
-    supportDesc.style.marginBottom = '20px';
   }
 }
